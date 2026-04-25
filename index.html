@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donasi Pixel RaXzz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Press Start 2P', cursive;
+  color:#8E0000;
+  text-align:center;
+  overflow:hidden;
+}
+
+/* BACKGROUND ANIMASI */
+.bg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,255,0,0.05) 0px,
+    rgba(0,255,0,0.05) 2px,
+    transparent 2px,
+    transparent 40px
+  );
+  animation: gerak 5s linear infinite;
+  z-index:-1;
+}
+@keyframes gerak{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(40px);}
+}
+
+/* halaman */
+.page{display:none;}
+.active{display:block;}
+
+.marquee{
+  overflow:hidden;
+  white-space:nowrap;
+  border-bottom:3px solid #630000;
+  padding:15px;
+}
+.marquee span{
+  display:inline-block;
+  padding-left:100%;
+  animation:geser 10s linear infinite;
+}
+@keyframes geser{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-100%);}
+}
+
+/* BUTTON STYLE */
+button{
+  font-family:'Press Start 2P';
+  border:3px solid #000;
+  padding:10px;
+  margin:10px;
+  cursor:pointer;
+  box-shadow:4px 4px #000;
+}
+
+/* warna */
+.btn-hijau{background:#013220;color:#FFFFFF;}
+.btn-biru{background:#001f3f;color:#FFFFFF;}
+.btn-putih{background:#ccc;color:#000;}
+
+button:hover{
+  transform:translateY(-2px);
+}
+
+/* popup */
+.popup{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  justify-content:center;
+  align-items:center;
+}
+
+.box{
+  background:#111;
+  border:4px solid #CD0505;
+  padding:20px;
+  width:300px;
+}
+
+input{
+  width:90%;
+  padding:8px;
+  margin:10px;
+  background:#000;
+  border:3px solid #B94300;
+  color:#C70404;
+  font-family:'Press Start 2P';
+}
+
+.qr{
+  border:4px solid #B72D00;
+  padding:10px;
+  display:inline-block;
+}
+
+.item{
+  border:2px solid #FF1900;
+  margin:8px;
+  padding:8px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div id="home" class="page active">
+<div class="marquee">
+<span>Yang Mau Bagi² Silakan Pencet Tombol Di Bawah Untuk Dana Kaget / Gopay</span>
+</div>
+
+<h2>DONASI PIXEL</h2>
+
+<button class="btn-hijau" onclick="bukaForm()">DONASI</button>
+<br>
+<button class="btn-biru" onclick="bukaList()">SUPPORTER</button>
+
+<p>RaXzzCode</p>
+</div>
+
+<div id="listPage" class="page">
+<h2>LIST SUPPORTER</h2>
+<div id="donaturList"></div>
+<button class="btn-putih" onclick="kembaliHome()">KEMBALI</button>
+</div>
+
+<div class="popup" id="formPopup">
+  <div class="box">
+    <h4>INPUT</h4>
+    <input id="nama" placeholder="Nama">
+    <input id="nominal" type="number" placeholder="Nominal">
+    <button class="btn-hijau" onclick="bayar()">BAYAR</button>
+    <button class="btn-putih" onclick="tutupForm()">KEMBALI</button>
+  </div>
+</div>
+
+<div class="popup" id="qrPopup">
+  <div class="box">
+    <div class="qr">
+      <img src="https://i.postimg.cc/Dz0D9X9T/qr-ID1025416739254-21-12-25-176631402-1766314031421.jpg" width="200">
+    </div>
+    <p>Transfer Sesuai Nominal</p>
+    <button class="btn-putih" onclick="kembaliQR()">OK</button>
+  </div>
+</div>
+
+<script>
+function bukaList(){
+  document.getElementById("home").classList.remove("active");
+  document.getElementById("listPage").classList.add("active");
+}
+function kembaliHome(){
+  document.getElementById("listPage").classList.remove("active");
+  document.getElementById("home").classList.add("active");
+}
+function bukaForm(){
+  document.getElementById("formPopup").style.display="flex";
+}
+function tutupForm(){
+  document.getElementById("formPopup").style.display="none";
+}
+
+function bayar(){
+  let nama = document.getElementById("nama").value;
+  let nominal = document.getElementById("nominal").value;
+
+  if(!nama || !nominal){
+    alert("Isi dulu!");
+    return;
+  }
+
+  kirimDonasi(nama, nominal);
+
+  // langsung pindah ke list 🔥
+  document.getElementById("formPopup").style.display="none";
+  document.getElementById("qrPopup").style.display="flex";
+
+  bukaList();
+}
+
+function kembaliQR(){
+  document.getElementById("qrPopup").style.display="none";
+}
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDnpxy3KFcssy8pWvz3UCTtHApPS22fNgU",
+  authDomain: "raxzz-project.firebaseapp.com",
+  databaseURL: "https://raxzz-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "raxzz-project",
+  storageBucket: "raxzz-project.firebasestorage.app",
+  messagingSenderId: "631055650268",
+  appId: "1:631055650268:web:bf88ac00b01436dc225319"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.kirimDonasi = function(nama, nominal){
+  push(ref(db, "donasi"), { nama, nominal });
+}
+
+const list = document.getElementById("donaturList");
+
+onValue(ref(db, "donasi"), (snapshot)=>{
+  let html="";
+  snapshot.forEach(child=>{
+    let d = child.val();
+    html += `<div class="item">${d.nama}<br>Rp${d.nominal}</div>`;
+  });
+  list.innerHTML = html;
+});
+</script>
+
+</body>
+</html>
